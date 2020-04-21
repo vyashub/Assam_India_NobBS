@@ -1,0 +1,89 @@
+
+install.packages("NobBS")
+install.packages("ggplot2")
+
+library(NobBS)
+library(ggplot2)
+
+data(denguedat)
+
+test_nowcast <- NobBS(data=denguedat, now=as.Date("2010-12-06"),
+                      units="1 week",onset_date="onset_week",report_date="report_week")
+
+tail(test_nowcast$estimates)
+
+tail(test_nowcast)
+
+covid_assam_data <- read.csv("covid_data.csv", stringsAsFactors = FALSE)
+
+#covid_assam_data$onset_week <- as.Date(covid_assam_data$onset_week , format = "%Y-%m-%d")
+#covid_assam_data$report_week <- as.Date(covid_assam_data$report_week , format = "%Y-%m-%d")
+
+covid_assam_data$onset_week <- as.Date(covid_assam_data$onset_week , format = "%d-%m-%Y")
+covid_assam_data$report_week <- as.Date(covid_assam_data$report_week , format = "%d-%m-%Y")
+
+str(covid_assam_data)
+
+assam_test_nowcast <- NobBS(data=covid_assam_data, now=as.Date("2020-04-27"),
+                      units="1 week",onset_date="onset_week",report_date="report_week")
+
+tail(assam_test_nowcast$estimates)
+
+assam_test_nowcast$estimates.inflated
+
+assam_test_nowcast$params.post
+
+
+nowcasts <- data.frame(assam_test_nowcast$estimates)
+
+ggplot(nowcasts) + geom_line(aes(onset_date,estimate,col="Nowcast estimate"),linetype="longdash") +
+  geom_line(aes(onset_date,n.reported,col="Reported to date"),linetype="solid") +
+  scale_colour_manual(name="",values=c("indianred3","black"))+
+  theme_classic()+
+  geom_ribbon(fill="indianred3",aes(x = onset_date,ymin=nowcasts$lower,
+                                    ymax=nowcasts$upper),alpha=0.3)+
+  xlab("Case onset date") + ylab("Estimated cases") +
+  ggtitle("Observed and predicted number of cases \nat the week of nowcast (Apr 2020) and weeks prior")
+
+----------------------------------------------------------------------------------------------------------------------
+covid_assam_data_april_latest <- read.csv("covid_data_April21.csv", stringsAsFactors = FALSE)
+covid_assam_data_april_latest$onset_week <- as.Date(covid_assam_data_april_latest$onset_week , format = "%d-%m-%Y")
+covid_assam_data_april_latest$report_week <- as.Date(covid_assam_data_april_latest$report_week , format = "%d-%m-%Y")
+
+str(covid_assam_data_april_latest)
+
+assam_test_nowcast_apr_latest <- NobBS(data=covid_assam_data_april_latest, now=as.Date("2020-04-27"),
+                                       units="1 week",onset_date="onset_week",report_date="report_week")
+
+assam_test_nowcast_apr_latest$estimates
+
+assam_test_nowcast_apr_latest$estimates.inflated
+
+assam_test_nowcast_apr_latest$params.post
+--------------------------------------------------------------------------------------------------
+golaghat_data_april_latest <- read.csv("golaghat_data_April21_week_mod.csv", stringsAsFactors = FALSE)
+golaghat_data_april_latest$onset_week <- as.Date(golaghat_data_april_latest$onset_week , format = "%d-%m-%Y")
+golaghat_data_april_latest$report_week <- as.Date(golaghat_data_april_latest$report_week , format = "%d-%m-%Y")
+
+str(golaghat_data_april_latest)
+
+golaghat_data_april_latest <- NobBS(data=golaghat_data_april_latest, now=as.Date("2020-04-20"),
+                                       units="1 day",onset_date="onset_week",report_date="report_week")
+
+golaghat_data_april_latest$estimates
+
+golaghat_data_april_latest$estimates.inflated
+-----------------------------------------------------------------------------
+
+golaghat_raw_data_april_latest <- read.csv("golaghat_data_April21.csv", stringsAsFactors = FALSE)
+golaghat_raw_data_april_latest$onset_week <- as.Date(golaghat_raw_data_april_latest$onset_week , format = "%Y-%m-%d")
+golaghat_raw_data_april_latest$report_week <- as.Date(golaghat_raw_data_april_latest$report_week , format = "%Y-%m-%d")
+
+str(golaghat_raw_data_april_latest)
+
+golaghat_raw_data_april_latest <- NobBS(data=golaghat_raw_data_april_latest, now=as.Date("2020-04-27"),
+                                        units="1 day",onset_date="onset_week",report_date="report_week")
+
+golaghat_raw_data_april_latest$estimates
+
+golaghat_raw_data_april_latest$estimates.inflated
